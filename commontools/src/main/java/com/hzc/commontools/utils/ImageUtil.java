@@ -19,9 +19,9 @@ import java.io.FileOutputStream;
 public class ImageUtil {
 
     private static final String TAG = "ImageUtil";
-    private static final float defaultWw = 480;
-    private static final float defaultHh = 800;
-    private static final int defaultMaxSize = 1024;
+    private static final float DEFAULT_WW = 480;
+    private static final float DEFAULT_HH = 800;
+    private static final int DEFAULT_MAX_SIZE = 1024;
 
     /**
      * 对原文件的处理方式
@@ -38,12 +38,11 @@ public class ImageUtil {
     /**
      * 质量压缩
      * @param context 上下文
-     * @param imagePath 缓存图片的文件
-     * @param filePath 原文件
+     * @param filePath 原文件路径
      * @return 压缩后图片的路径
      */
-    public static String qualityCompress(Context context, String imagePath, String filePath){
-        return qualityCompress(context, imagePath, filePath,defaultMaxSize,DELETE_TYPE.DEFAULT);
+    public static String qualityCompress(Context context, String filePath){
+        return qualityCompress(context, "qualityCompress", filePath,DEFAULT_MAX_SIZE,DELETE_TYPE.DEFAULT);
     }
 
     /**
@@ -51,7 +50,7 @@ public class ImageUtil {
      * png格式压缩没有作用，bytes.length不会变化，因为png图片是无损的，不能进行压缩。
      * @param context 上下文
      * @param imagePath 缓存图片的文件
-     * @param filePath 原文件
+     * @param filePath 原文件路径
      * @param maxSize 最大压缩大小
      * @param type 对原文件的处理方式
      * @return 压缩后图片的路径
@@ -64,7 +63,7 @@ public class ImageUtil {
             String suffix = filePath.substring(filePath.lastIndexOf("."));
             //压缩后缓存图片的路径
             long time = System.currentTimeMillis();
-            String newFilePath = getPathCachePath(context,imagePath) + time + "_quality" + suffix;
+            String newFilePath = FileUtil.getCacheDir(context,imagePath) + time + "_quality" + suffix;
             File newFile = new File(newFilePath);
             File oldFile = new File(filePath);
             is = new FileInputStream(oldFile);
@@ -109,25 +108,24 @@ public class ImageUtil {
     /**
      * 比例压缩
      * @param context 上下文
-     * @param imagePath 缓存图片的文件
-     * @param filePath 原文件
+     * @param filePath 原文件路径
      * @return 压缩后图片的路径
      */
-    public String proportionCompress(Context context,String imagePath,String filePath){
-        return proportionCompress(context, imagePath, filePath,defaultWw,defaultHh,DELETE_TYPE.DEFAULT);
+    public static String proportionCompress(Context context,String filePath){
+        return proportionCompress(context, "proportionCompress", filePath,DEFAULT_WW,DEFAULT_HH,DELETE_TYPE.DEFAULT);
     }
 
     /**
      * 比例压缩
      * @param context 上下文
      * @param imagePath 缓存图片的文件
-     * @param filePath 原文件
+     * @param filePath 原文件路径
      * @param ww 宽度
      * @param hh 高度
      * @param type 对原文件的处理方式
      * @return 压缩后图片的路径
      */
-    public String proportionCompress(Context context,String imagePath,String filePath,float ww,float hh,DELETE_TYPE type) {
+    public static String proportionCompress(Context context,String imagePath,String filePath,float ww,float hh,DELETE_TYPE type) {
         BitmapFactory.Options newOpts = new BitmapFactory.Options();
         //开始读入图片，此时把options.inJustDecodeBounds 设回true了
         //如果该值设为true那么将不返回实际的bitmap，也不给其分配内存空间这样就避免内存溢出了。但是允许我们查询图片的信息这其中就包括图片大小信息
@@ -161,7 +159,7 @@ public class ImageUtil {
         //原文件后缀
         String suffix = filePath.substring(filePath.lastIndexOf("."));
         long time = System.currentTimeMillis();
-        String newFilePath = getPathCachePath(context,imagePath) + time + "_proportion" + suffix;
+        String newFilePath = FileUtil.getCacheDir(context,imagePath) + time + "_proportion" + suffix;
         File newFile = new File(newFilePath);
         try {
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFile));
@@ -182,48 +180,28 @@ public class ImageUtil {
     /**
      * 默认压缩
      * @param context 上下文
-     * @param imagePath 缓存图片的文件
-     * @param filePath 原文件
+     * @param filePath 原文件路径
      * @return 压缩后图片的路径
      */
-    public String defaultCompress(Context context,String imagePath,String filePath){
-        String compress = proportionCompress(context, imagePath, filePath, defaultWw, defaultHh, DELETE_TYPE.DEFAULT);
-        return qualityCompress(context, imagePath, compress, defaultMaxSize, DELETE_TYPE.DEFAULT);
+    public static String defaultCompress(Context context,String filePath){
+        String compress = proportionCompress(context, filePath);
+        return qualityCompress(context, compress);
     }
 
     /**
      * 默认压缩
      * @param context 上下文
      * @param imagePath 缓存图片的文件
-     * @param filePath 原文件
+     * @param filePath 原文件路径
      * @param maxSize 最大压缩大小
      * @param ww 宽度
      * @param hh 高度
      * @param type 对原文件的处理方式
      * @return 压缩后图片的路径
      */
-    public String defaultCompress(Context context,String imagePath,String filePath,int maxSize,float ww,float hh,DELETE_TYPE type){
+    public static String defaultCompress(Context context,String imagePath,String filePath,int maxSize,float ww,float hh,DELETE_TYPE type){
         String compress = proportionCompress(context, imagePath, filePath, ww, hh, type);
         return qualityCompress(context, imagePath, compress, maxSize, type);
-    }
-
-    /**
-     * 获取缓存路径下指定文件
-     * @param context 上下文
-     * @param name 文件名
-     * @return 文件路径
-     */
-    public static String getPathCachePath(Context context,String name){
-        String path = context.getCacheDir().getPath() + "/" + name;
-        File file = new File(path);
-        if(!file.exists()){
-            boolean isSuccess = file.mkdirs();
-            if(isSuccess){
-                Log.d(TAG,file + " 文件夹创建成功");
-            }
-        }
-        return path + "/";
-
     }
 
     /**
@@ -235,10 +213,13 @@ public class ImageUtil {
     private static void deleteOldFile(Context context,File oldFile,DELETE_TYPE type){
         String oldPath = oldFile.getPath();
         String cachePath = context.getCacheDir().getPath();
+        String filesPath = context.getFilesDir().getPath();
+        String externalCachePath = context.getExternalCacheDir().getPath();
+        String externalFilesPath = context.getExternalFilesDir(null).getPath();
         switch (type){
             //只删除缓存中的图片，不删除本机照片
             case DEFAULT:
-                if(oldPath.substring(0,cachePath.length()).equals(cachePath)){
+                if(oldPath.startsWith(cachePath) || oldPath.startsWith(filesPath) || oldPath.startsWith(externalCachePath) || oldPath.startsWith(externalFilesPath)){
                     boolean isSuccess = oldFile.delete();
                     Log.d(TAG, oldPath + "文件删除操作" + isSuccess);
                 }

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ImageRecycleView">
+        <attr name="defaultImage" format="reference"/>
+        <attr name="maxSize" format="integer"/>
+    </declare-styleable>
+
+    <declare-styleable name="IndicatorView">
+        <!--是否水平居中-->
+        <attr name="indicator_icon" format="reference" />
+        <!--滑动小圆点是否跟随-->
+        <attr name="indicator_margin" format="dimension" />
+        <!--背景小圆点颜色-->
+        <attr name="indicator_smooth" format="boolean" />
+
+    </declare-styleable>
+</resources>

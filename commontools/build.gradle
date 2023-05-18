@@ -29,6 +29,15 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    /*sourceSets{
+        main{
+            res.srcDirs = [
+                    'src/main/res',
+                    'src/main/res/layout-easyphotos'
+            ]
+        }
+    }*/
+
 }
 
 dependencies {
@@ -38,12 +47,19 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation project(':easyPhotos')
     //动态适配器
     api 'com.google.android.flexbox:flexbox:3.0.0'
     //图片选择器
-    api 'com.github.HuanTanSheng:EasyPhotos:3.1.5'
+    //api 'com.github.HuanTanSheng:EasyPhotos:3.1.5'
     //图片加载器
     api 'com.github.bumptech.glide:glide:4.15.1'
     //权限获取
     api 'com.github.tbruyelle:rxpermissions:0.12'
+    //rxAndroid
+    api 'io.reactivex.rxjava3:rxandroid:3.0.2'
+    api 'io.reactivex.rxjava3:rxjava:3.1.5'
+    //图片缩放
+    api 'com.github.chrisbanes:PhotoView:2.3.0'
+
 }
